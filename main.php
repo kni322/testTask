@@ -27,7 +27,7 @@ while(!$game->endGame()){
     }
 
     if(count($game->countFree($game->field->data)) == 0) {                  //Если свободных ячеек нет - ничья.
-        print("\e[5;31mDRAW");
+        print("[5;31mDRAW[0m\n");
         $game->field->draw();
         exit;
     }
