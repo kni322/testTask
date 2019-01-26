@@ -18,10 +18,15 @@ while(!$game->endGame()){
     if($game->curr_player == $game->human)
         $game->turn($game->curr_player);
     else {
-        if($game->field->data[4] != 4) {                                    //Оптимальный ход это самый центр поля, можно не запускать рекурсию, если это поле свободно.
-            $index = $game->miniMax($game->field->data, $game->ai);         //Иначе Минимакс'ом ищем оптимальный ход.
-            $game->field->put($game->ai, $index->index);                    //И ставим "X" в эту ячейку.
-        }else{                                                              //
+        if($game->field->data[4] != 4) {                                        //Оптимальный ход это самый центр поля, можно не запускать рекурсию, если это поле свободно.
+            $lastTurn = $game->lastTurn();
+
+            if(!$lastTurn) {                                                    //Проверка может ли игра завершится в этот ход бота или в след. ход человека (тогда нужно защищаться)
+                $index = $game->miniMax($game->field->data, $game->ai);         //Иначе Минимакс'ом ищем оптимальный ход.
+                $game->field->put($game->ai, $index->index);                    //И ставим "X" в эту ячейку.
+            }else
+                $game->field->put($game->ai, $lastTurn);                        //Либо блокируем победу человека, либо завершаем игру сами.
+        }else{
             $game->field->put($game->ai, 4);
         }
     }
