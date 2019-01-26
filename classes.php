@@ -128,7 +128,7 @@ class game{
         else
             return false;
     }
-    //Функция определения конца игры
+    //Функция определения конца игры.
     public function endGame(){
         if($this->win($this->field->data, $this->ai)){
             $this->winner = "\x1b[5;31mYou DEFEAT!\n\x1b[0m";
@@ -157,6 +157,40 @@ class game{
             $this->turn($char);
         }
 
+    }
+    //Проверка может ли игра завершиться в этот ход бота, либо в следущий ход человека
+    public function lastTurn(){
+        //Найдем все свободные ячейки
+        $avFree = $this->countFree($this->field->data);
+        /*
+         * По очереди будет проверять 2 условия:
+         *  1) бот может победить сейчас
+         *  2) человек победит в следущий ход и нужно заблокировать его
+         *  3) если 2 условия не выполняются - вернем False
+         *
+         * Проверять будем просто подстановкой так как сложность O(n)
+         *
+         * После каждой подстановки будем стирать значение
+         */
+        foreach ($avFree as $item){
+            $this->field->data[$item] = $this->ai;
+
+            if($this->endGame()){
+                $this->field->data[$item] = $item;
+
+                return $item;
+            }else{
+                $this->field->data[$item] = $this->human;
+
+                if($this->endGame()){
+                    $this->field->data[$item] = $item;
+
+                    return $item;
+                }
+            }
+            $this->field->data[$item] = $item;
+        }
+        return false;
     }
     //Смена хода
     public function swapTurn(){
@@ -205,5 +239,4 @@ class field{
 class variable{
     public $index;
     public $score;
-
 }
